@@ -27,6 +27,8 @@
           <p class="explain">数据从数据库出来到可以填入并生成图表,比如echarts,height chart等自身不带数据聚合功能的图表库,会涉及很多复杂的数据处理,使用JCalculator会使这些操作更加简单,进行图表二次封装的时候更加轻松且逻辑清晰。这是我并不是对图表封装，只是展示一些数据处理过程。这里以echarts3.X为例。这里的例子是我往相对复杂的写，可能有些项目实际情况可能没有这么复杂，但我个人情况是比这个例子复杂的。</p>
           <pre class="show-code">
             <code class="language-javascript">
+              //echarts 3.X例子
+
               // 数据：终端访问量/天。模拟直接从数据库查出来的数据。
               // 通过这个数据生成总的终端访问比例饼图。
               var data = [
@@ -153,7 +155,7 @@
               var legend = [];
               var x = [];
               var series = [];
-              jc.forIn(lineData, function (key, val, obj) {
+              jc.forIn(lineData, function (key, val) {
                 if (key == "day") {
                   x = val;
                 } else {
@@ -348,7 +350,7 @@
     var legend = [];
     var x = [];
     var series = [];
-    jc.forIn(lineData, function (key, val, obj) {
+    jc.forIn(lineData, function (key, val) {
       if (key == "day") {
         x = val;
       } else {
