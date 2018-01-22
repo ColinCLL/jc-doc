@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <title>JCalculator</title>
+  <link rel="stylesheet" href="../public/css/base.css">
+  <link rel="stylesheet" href="../public/css/prism.css">
+  <!-- <link rel="stylesheet" href="../public/css/index.css"> -->
+</head>
+<body>
+  <header>
+    <img class="logo" src="../public/img/logo.png" alt="logo">
+    <nav class="nav">
+      <ul>
+        <li class="nav-item "><a href="../index.html">主页</a></li>
+        <li class="nav-item active">文档</li>
+        <li class="nav-item "><a href="./leftJoin.html">示例</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="container clearfix">
+    <aside class="left">
+      <ul class="list">
+        <p class="list-title">API</p>
+        <li class="category active">
+          <span class="dot dot-bottom"></span><a href="#_sql">.sql<span class="type">({</span></a>
+          <ul class="category-list">
+            <li class="question">
+              <span class="dot dot-bottom"></span><a href="#_select">select<span class="type">:{</span></a>
+              <ul class="category-list">
+                <li class="question"><a href="#_col">col: <span class="type">..,</span></a></li>
+                <li class="question"><a href="#_sum">sum: <span class="type">..,</span></a></li>
+                <li class="question"><a href="#_avg">avg: <span class="type">..,</span></a></li>
+                <li class="question"><a href="#_count">count: <span class="type">..,</span></a></li>
+                <li class="question"><a href="#_max">max: <span class="type">..,</span></a></li>
+                <li class="question"><a href="#_min">min: <span class="type">..</span></a></li>
+              </ul>
+              <span>},</span>
+            </li>
+            <li class="question"><a href="#_from">from: <span class="type">..,</span></a></li>
+            <li class="question"><a href="#_where">where: <span class="type">..,</span></a></li>
+            <li class="question"><a href="#_groupBy">groupBy: <span class="type">..,</span></a></li>
+            <li class="question"><a href="#_having">having: <span class="type">..,</span></a></li>
+            <li class="question"><a href="#_orderBy">orderBy: <span class="type">..,</span></a></li>
+            <li class="question"><a href="#_limit">limit: <span class="type">..</span></a></li>
+          </ul>
+          <span>});</span>
+        </li>
+        <li class="category">
+          <a href="#tree">.tree<span class="type">(data,option)</span></a>
+        </li>
+        <li class="category">
+          <a href="#keyArray">.keyArray<span class="type">(data,["key"])</span></a>
+        </li>
+        <li class="category">
+          <a href="#keyBreak">.keyBreak<span class="type">(data,option)</span></a>
+        </li>
+        <li class="category">
+          <a href="#unique">.unique<span class="type">(data)</span></a>
+        </li>
+        <li class="category">
+          <a href="#spaceFix">.spaceFix<span class="type">(data,option)</span></a>
+        </li>
+        <li class="category">
+          <a href="#extend">.extend<span class="type">(data,option)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#groupBy">.groupBy<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#where">.where<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#orderBy">.orderBy<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#limit">.limit<span class="type">(data,option)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#max">.max<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#min">.min<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#map">.map<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#forIn">.forIn<span class="type">(data,iteratee)</span></a>
+        </li>
+        <li class="category">
+          <a href = "#judge">类型判断相关<span class="type"></span></a>
+        </lil>
+      </ul>
+    </aside>
+    <section class="main">
+      <ul class="node-list">
+        <li class="node">
+          <div id="_sql" class="href"></div>
+          <h1>.sql</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(data, query); 第一个参数是[obj,obj,obj]形式的数据, query:数据处理逻辑对象。可以使用类似数据库SQL单表查询的API逻辑，处理复杂数据逻辑计算。</p>
+          <p class="text-row">query对象执行顺序：</p>
+          <p class="text-row">1.from</p>
+          <p class="text-row">2.where</p>
+          <p class="text-row">3.groupBy</p>
+          <p class="text-row">4.having</p>
+          <p class="text-row">5.select</p>
+          <p class="text-row">6.orderBy</p>
+          <p class="text-row">7.limit</p>
+          <p class="tip success-tip">并强制不要求书写代码顺序，但执行顺序会按照以上列表</p>
+          <p class="tip warning-tip">orderBy使用的字段是select之后的字段, 因为select之后字段可能发生改变了。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 模拟数据：模拟国庆7天深圳广州人流量数据，下面所有代码示例都将
+              // sql方法都使用该模拟数据，不再一一列出，我知道这样不好，允许我偷个懒，欢迎PR
+              var table = [
+              {time:"10月1日", inPerson:20, outPerson:1000, region: "广州",fly:12},
+              {time:"10月1日", inPerson:13, outPerson:900, region: "深圳",fly:2},
+              {time:"10月2日", inPerson:15, outPerson:900, region: "广州",fly:null},
+              {time:"10月2日", inPerson:15, outPerson:1000, region: "深圳",fly:0},
+              {time:"10月2日", inPerson:15, outPerson:1000, region: "深圳"},
+              {time:"10月3日", inPerson:15, outPerson:100, region: "广州"},
+              {time:"10月3日", inPerson:15, outPerson:100, region: "深圳"},
+              {time:"10月4日", inPerson:90, outPerson:60, region: "广州"},
+              {time:"10月4日", inPerson:70, outPerson:50, region: "深圳"},
+              {time:"10月5日", inPerson:500, outPerson:39, region: "广州"},
+              {time:"10月5日", inPerson:350, outPerson:30, region: "深圳"},
+              {time:"10月6日", inPerson:900, outPerson:15, region: "广州"},
+              {time:"10月6日", inPerson:1000, outPerson:15, region: "深圳"},
+              {time:"10月7日", inPerson:900, outPerson:10, region: "广州"},
+              {time:"10月7日", inPerson:1200, outPerson:7, region: "深圳"}
+              ]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_select" class="href"></div>
+          <h1><span class="father-title">.query</span>.select</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query配置对象中的select, 用于对数据进行操作。</p>
+          <p class="text-row">select包含对象：</p>
+          <p class="text-row">1.col, 选择或操作列</p>
+          <p class="text-row">2.sum, 取和计算</p>
+          <p class="text-row">3.avg, 取平均计算</p>
+          <p class="text-row">4.conut, 计数运算</p>
+          <p class="text-row">5.max, 取最大值运算</p>
+          <p class="text-row">6.min, 取最小值运算</p>
+        </li>
+        <li class="node">
+          <div id="_col" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.col</h1>
+          <div id = "_select" class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的col, 用于对数据进行选择列操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"col_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调值为源数据的行。</p>
+          <p class="tip success-tip">缺失的数据会以underfined存在。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 其他用法可以参考sum方法，不一一列举
+              var col1 = jc.sql({
+                select: {
+                  col: ["inPerson","outPerson","fly"]
+                },
+                from: table // 文档jc.sql给出了模拟数据
+              });
+              console.log(JSON.stringify(col1));
+              // output:[
+              // {"inPerson":20,"outPerson":1000,"fly":12},
+              // {"inPerson":13,"outPerson":900,"fly":2},
+              // {"inPerson":15,"outPerson":900,"fly":null},
+              // {"inPerson":15,"outPerson":1000,"fly":0},
+              // {"inPerson":15,"outPerson":100, fly: undefined},
+              // {"inPerson":15,"outPerson":100, fly: undefined},
+              // {"inPerson":90,"outPerson":60, fly: undefined},
+              // {"inPerson":70,"outPerson":50, fly: undefined},
+              // {"inPerson":500,"outPerson":39, fly: undefined},
+              // {"inPerson":350,"outPerson":30, fly: undefined},
+              // {"inPerson":900,"outPerson":15, fly: undefined},
+              // {"inPerson":1000,"outPerson":15, fly: undefined},
+              // {"inPerson":900,"outPerson":10, fly: undefined},
+              // {"inPerson":1200,"outPerson":7, fly: undefined}
+              // ]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_sum" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.sum</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的sum, 用于对数据进行加法操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"sum_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调值为源数据的行。</p>
+            <pre class="show-code">
+              <code class="language-javascript">
+                // sum："String"用法
+                var sum1 = jc.sql({
+                  select: {
+                    sum: "inPerson"
+                  },
+                  from: table  // 文档jc.sql给出了模拟数据
+                })
+                console.log(sum1)
+                // output: {sum_inPerson: 5103}
+                
+                // sum：[array]用法
+                var sum2 = jc.sql({
+                  select: {
+                    sum: ["inPerson","outPerson"]
+                  },
+                  from: table
+                });
+                console.log(sum2);
+                // output:[{sum_inPerson: 5103, sum_outPerson: 4226}]
+                
+                // sum：{obj}用法
+                var sum3 = jc.sql({
+                  select: {
+                    sum: {
+                      "inPerson": function (row) {
+                        return row.inPerson
+                      },
+                      "outPerson": "outPerson",
+                      "流动人口总和": function (row) {
+                        return row.inPerson + row.outPerson;
+                      }
+                    }
+                  },
+                  from: table
+                });
+                console.log(sum3);
+                // output:[{inPerson: 5103, outPerson: 4226, 流动人口总和: 9329}]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_avg" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.avg</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的avg, 用于对数据进行平均操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"avg_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调值为源数据的行。</p>
+          <p class="tip warning-tip">不会把undefined, null, false的值当做0来算平均, 这点遵循了数据库的计算规则。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 主要展示avg的null值的情况下avg的计算情况，其他使用规则参考sum方法的例子
+              var avg1 = jc.sql({
+                select: {
+                  avg: ["inPerson","outPerson","fly"],
+                },
+                from: table
+              });
+              console.log(avg1);
+              // output:[{avg_inPerson: 364.5, avg_outPerson: 301.85714285714283, avg_fly: 4.666666666666667}]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_max" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.max</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的max, 用于对数据进行取最大值操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"max_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调参数为源数据的行。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+            var data = jc.sql({
+              select: {
+                max: {
+                  fly: "fly",
+                  in: function (row) {
+                      return row.inPerson
+                  }
+                }
+              },
+              from: table
+            });
+            // output: [{ "fly": 12, in: 1200 }];
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_min" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.min</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的min, 用于对数据进行去最小值操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"min_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调值为源数据的行。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 其他用法可以参考sum。
+              var count = jc.sql({
+                select: {
+                  min: {
+                    fly: "fly",
+                    in: function (row) {
+                        return row.inPerson
+                    }
+                  }
+                },
+                from: table
+              });
+              console.log(count);
+              // output:[{"count_inPerson":14,"count_outPerson":14,"count_fly":3}]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_count" class="href"></div>
+          <h1><span class="father-title">.query.select</span>.count</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.select配置对象中的count, 用于对数据进行计数操作,类型：string|array|obj。</p>
+          <p class="tip success-tip">string和array类型下会自动在原有列的名称前面添加"count_"作为新的一列。obj类型的键为自定义列的名称,val为string|function(row){}, string为要选择的列，function回调值为源数据的行。</p>
+          <p class="tip warning-tip">count(*)计算行的个数，count(col)计算存在的除了undefined和null以外的col的个数count(*)计算行的个数，count(col)计算存在的除了undefined和null以外的col的个数,和数据库SQL逻辑一直</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 其他用法可以参考sum。
+              var count = jc.sql({
+                select: {
+                  count: ["inPerson","outPerson","fly"]
+                },
+                from: table
+              });
+              console.log(count);
+              // output:[{"count_inPerson":14,"count_outPerson":14,"count_fly":3}]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_from" class="href"></div>
+          <h1><span class="father-title">.query</span>.from</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.from配置对象, 传入需要操作的数据, 类型：数组对象[obj,obj,...,obj]。</p>
+        </li>
+        <li class="node">
+          <div id="_where" class="href"></div>
+          <h1><span class="father-title">.query</span>.where</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.where配置对象,  对传入数据进行过滤操作, 类型：obj|function。</p>
+          <p class="tip success-tip">类型是obj的情况下，过滤出包含该对象的行。function回调参数为row,过滤出return值为true的行。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // where: {obj};
+              var data = jc.sql({
+                select: {
+                    col: ["time", "inPerson"],
+                },
+                from: table,
+                where: {time: "10月1日"}
+              });
+
+              /* output: [
+                { time: "10月1日", inPerson: 20},
+                { time: "10月1日", inPerson: 13}
+              ] */
+
+
+              // where: function (row) { return true};
+              var data = jc.sql({
+                select: {
+                    col: ["time", "inPerson"],
+                },
+                from: table,
+                where: function (row) {
+                    return row.time == "10月1日" && row.inPerson < 15
+                }
+              });
+
+              /* output: [
+                  { time: "10月1日", inPerson: 13 }
+              ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_groupBy" class="href"></div>
+          <h1><span class="father-title">.query</span>.groupBy</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.groupBy配置对象, 对传入数据进行分组操作, 类型：string|array|function。</p>
+          <p class="tip success-tip">根据配置进行分组。function的返回值可以是String,Array。而Array的值可以是String, function(row){}</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // groupBy: {obj};
+              var groupBy1 = jc.sql({
+                select: {
+                  count: ["inPerson","outPerson","fly"]
+                },
+                from: table,
+                groupBy:"time"
+              });
+              console.log(groupBy1);
+              // output: [
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":2},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":2},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":0},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":0},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":0},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":0},
+              // {"count_inPerson":2,"count_outPerson":2,"count_fly":0}
+              // ]
+
+              // groupBy: function (row) { return true};
+              var groupBy2 = jc.sql({
+                select: {
+                  sum: "inPerson"
+                },
+                from: table,
+                groupBy: function (row) {
+                  return row.time
+                }
+              });
+              console.log(groupBy2);
+              // output:[
+              // {"sum_inPerson":33},
+              // {"sum_inPerson":30},
+              // {"sum_inPerson":30},
+              // {"sum_inPerson":160},
+              // {"sum_inPerson":850},
+              // {"sum_inPerson":1900},
+              // {"sum_inPerson":2100}
+              // ]
+
+              // groupBy: ["string", function (row) {}];
+              var groupBy3 = jc.sql({
+                select: {
+                  sum: "inPerson"
+                },
+                from: table,
+                groupBy: ["fly"]
+              });
+              console.log(groupBy3);
+              // output:[
+              // {"sum_inPerson":15},
+              // {"sum_inPerson":13},
+              // {"sum_inPerson":20},
+              // {"sum_inPerson":5055}
+              // ]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_having" class="href"></div>
+          <h1><span class="father-title">.query</span>.having</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.having, 对分组进行多虑操作, 类型：obj。</p>
+          <p class="tip success-tip">使用{sum_aa+bb:">10"}， 来限定分组中，过滤分组中所有键名为aa加bb之和大于10的。having对象的键第一部分为计算方式[sum,avg,max,min,conut]其中之一，后面接数学计算式子，用"_"分割开。having对象的值是判断条件。</p>
+          <p class="tip warning-tip">having多个键值对之间的关系是"且"，对应数据库"and"，暂时不支持"或"操作，对应数据库操作"or"。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+                // 广深总人口流动大于1000万的日期分析
+                var having1 = jc.sql({
+                  select: {
+                    col:{
+                      "时间":"time"
+                    },
+                    sum: {
+                      "inPerson":"inPerson",
+                      "outPerson":"outPerson",
+                      "allSum":function(row){
+                        return row.inPerson + row.outPerson
+                      }
+                    },
+                    avg: {
+                      "流入人口平均数":"inPerson",
+                      "流出人口平均数":"outPerson",
+                      "流入流出人口平均数":function(row){
+                        return row.inPerson + row.outPerson
+                      }
+                    }
+                  },
+                  from: table,
+                  groupBy: "time",
+                  having: {"sum_inPerson+outPerson":">1000"}
+                })
+                console.log(having1)
+                // 输出: [{"时间":"10月1日","inPerson":33,"outPerson":1900,"allSum":1933,"流入人口平均数":16.5,"流出人口平均数":950,"流入流出人口平均数":966.5},
+                // {"时间":"10月2日","inPerson":30,"outPerson":1900,"allSum":1930,"流入人口平均数":15,"流出人口平均数":950,"流入流出人口平均数":965},
+                // {"时间":"10月6日","inPerson":1900,"outPerson":30,"allSum":1930,"流入人口平均数":950,"流出人口平均数":15,"流入流出人口平均数":965},
+                // {"时间":"10月7日","inPerson":2100,"outPerson":17,"allSum":2117,"流入人口平均数":1050,"流出人口平均数":8.5,"流入流出人口平均数":1058.5}];
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_orderBy" class="href"></div>
+          <h1><span class="father-title">.query</span>.orderBy</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.orderBy, 对数据进行排序操作, 类型：obj||function</p>
+          <p class="tip success-tip">obj类型下可以这样使用{key:"desc"},也可以是大写。那么将会数据中键为key的值进行排序。function类型下回调的函数的参数为(left, right)使用方法类似原生sort。</p>
+          <p class="tip warning-tip">obj类型下值不是"desc"或"DESC"都会被默认为"ASC",顺序。且对象形态下目前只能用于数字排序，汉字英文之类的排序请在function自由发挥。orderBy计算顺序在select之后，数据已经变成新构造的数据，那么操作数据的时候就要用新的键名</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+                // 广深总人口流动大于1000万的日期分析
+                var orderBy = jc.sql({
+                  select: {
+                    col:{
+                      "时间":"time"
+                    },
+                    sum: {
+                      "inPerson":"inPerson",
+                      "outPerson":"outPerson",
+                      "allSum":function(row){
+                        return row.inPerson + row.outPerson
+                      }
+                    },
+                    avg: {
+                      "流入人口平均数":"inPerson",
+                      "流出人口平均数":"outPerson",
+                      "流入流出人口平均数":function(row){
+                        return row.inPerson + row.outPerson
+                      }
+                    }
+                  },
+                  from: table,
+                  groupBy: "time",
+                  having: {"sum_inPerson+outPerson":">1000"},
+                  orderBy:function (left, right) {
+                    return left["流入人口平均数"] < right["流入人口平均数"];
+                  }
+                })
+                console.log(orderBy)
+                // 输出: [{"时间":"10月7日","inPerson":2100,"outPerson":17,"allSum":2117,"流入人口平均数":1050,"流出人口平均数":8.5,"流入流出人口平均数":1058.5},
+                // {"时间":"10月6日","inPerson":1900,"outPerson":30,"allSum":1930,"流入人口平均数":950,"流出人口平均数":15,"流入流出人口平均数":965},
+                // {"时间":"10月1日","inPerson":33,"outPerson":1900,"allSum":1933,"流入人口平均数":16.5,"流出人口平均数":950,"流入流出人口平均数":966.5},
+                // {"时间":"10月2日","inPerson":30,"outPerson":1900,"allSum":1930,"流入人口平均数":15,"流出人口平均数":950,"流入流出人口平均数":965}]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="_limit" class="href"></div>
+          <h1><span class="father-title">.query</span>.limit</h1>
+          <div class="line"></div>
+          <p class="explain">jc.sql(query) 中 query.limit, 返回指定的记录数, 类型：number||array</p>
+          <p class="tip success-tip">number类型下限制条数。array类型下有两个参数，如[1,2]，第一个参数说明从下标1位置开始，第二个参数说明选择后面2条数据，用法类似MYSQL。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var data = jc.sql({
+                select: {
+                    col: ["time", "inPerson"],
+                },
+                from: table,
+                limit: [1,2]
+              });
+              console.log(data);
+              // output:[ { time: "10月1日", inPerson: 13}, { time: "10月2日", inPerson: 15} ]
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="tree" class="href"></div>
+          <h1><span class="father-title"></span>.tree</h1>
+          <div class="line"></div>
+          <p class="explain">jc.tree(table, option), 生成树结构json</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，每行数据必须包括id(该行数据唯一识别号)，parent(父节点的ID)，使用tree必须要有一个确定的root（根节点ID），root根节点所在的行parent为null,root根节点也可以不必真实存在（如下例），但使用的时候还是要求用户自己知道根节点ID进行配置，不会自动发现。</p>
+          <p class="tip success-tip">第二个参数是生成树配置项，root配置根节点ID,id为每行唯一识别号所在字段，parent为父节点所在字段。retain是可选配置的，配置保留的字段，支持strting,array，object三种类型，用法类似sql方法中的col,object模式下可以改名，可以使用function (row)的回调函数。</p>
+          <p class="tip warning-tip">该函数不认为环形的父子关系（如你孙子可能是你父亲）的json数据是错的，一样可以正常生成，因为这是你输入的。虽然我不知道这种数据有什么用，但我不敢说这样是错的，然后做容错处理。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [
+                  { id: 1, pid: 0, name: "china", value: 1231 },
+                  { id: 2, pid: 1, name: "guangdong", value: 4321 },
+                  { id: 3, pid: 2, name: "shenzhen", value: 461 },
+                  { id: 4, pid: 2, name: "guangzhou", value: 512 },
+                  { id: 5, pid: 0, name: "USA", value: 911 },
+                  { id: 6, pid: 5, name: "AK", value: 654 }
+              ];
+              var data = jc.tree(table, {
+                  root: 0,
+                  id: "id",
+                  parent: "pid",
+                  retain: {
+                      palce: "name",
+                      value: function (row) {
+                          return "$" + row.value
+                      }
+                  }
+              });
+              data.should.deepEqual({
+                  "children": [
+                      {
+                          "id": 1,
+                          "pid": 0,
+                          "palce": "china",
+                          "value": "$1231",
+                          "children": [
+                              {
+                                  "id": 2,
+                                  "pid": 1,
+                                  "palce": "guangdong",
+                                  "value": "$4321",
+                                  "children": [
+                                      {
+                                          "id": 3,
+                                          "pid": 2,
+                                          "palce": "shenzhen",
+                                          "value": "$461"
+                                      },
+                                      {
+                                          "id": 4,
+                                          "pid": 2,
+                                          "palce": "guangzhou",
+                                          "value": "$512"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "id": 5,
+                          "pid": 0,
+                          "palce": "USA",
+                          "value": "$911",
+                          "children": [
+                              {
+                                  "id": 6,
+                                  "pid": 5,
+                                  "palce": "AK",
+                                  "value": "$654"
+                              }
+                          ]
+                      }
+                  ]
+              });
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="keyArray" class="href"></div>
+          <h1><span class="father-title"></span>.keyArray</h1>
+          <div class="line"></div>
+          <p class="explain">jc.keyArry(table, [key, key]), 对数据降维收缩</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，第二个参数是选择第一个参数数据某列数据进行转数组;</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [
+                { time: "10/1", mac: 10, win: 20 },
+                { time: "10/1", mac: 30, win: 20 },
+                { time: "10/1", mac: 45, win: 20 },
+                { time: "10/1", mac: 20, win: 20 }
+              ];
+              var data = jc.keyArray(table, ["time", "mac"]);
+              /* output:{
+                time: ["10/1", "10/1", "10/1", "10/1"],
+                mac: [10, 30, 45, 20]
+              }; */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="keyBreak" class="href"></div>
+          <h1><span class="father-title"></span>.keyBreak</h1>
+          <div class="line"></div>
+          <p class="explain">jc.keyBreak(table, option), 拆分数据</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，第二个参数是配置项，具体看下面代码注释</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [{ time: "10/1", mac: 10, win: 20 }];
+              var data = jc.keyBreak(table, {
+                  break: ["mac", "win"], // 需要拆分的键名
+                  key: "type",           // break的字段将会作为该字段的值
+                  value: "value",        // break的字段对应值将会作为该字段的值
+                  retain: ["time"]       // 拆分后保留的字段
+              });
+              console.log(data);
+              /* output:[
+                  { time: "10/1", type: "mac", value: 10 },
+                  { time: "10/1", type: "win", value: 20 }
+              ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="unique" class="href"></div>
+          <h1><span class="father-title"></span>.unique</h1>
+          <div class="line"></div>
+          <p class="explain">jc.unique(array), 去重</p>
+          <p class="tip success-tip">参数是数组</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [
+                  { number: 1, name: "Colin" },
+                  { number: 1, name: "Colin" },
+                  { number: 2, name: "Colin" },
+                  { number: 3, name: "Mr Chen" },
+                  { number: 3, name: "Mr Chen" }
+              ]
+              var data = jc.unique(table);
+              console.log(data);
+              /* output:[
+                  { number: 1, name: "Colin" },
+                  { number: 2, name: "Colin" },
+                  { number: 3, name: "Mr Chen" }
+              ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="spaceFix" class="href"></div>
+          <h1><span class="father-title"></span>.spaceFix</h1>
+          <div class="line"></div>
+          <p class="explain">jc.spaceFix(data, option), 补全数据间隔</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，第二个参数是配置项，具体看下面代码注释</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+            var time = [
+                { TIME: 1514736000, IN: 10, OUT: 10 }, // 时间戳是 2018年1月1日
+                { TIME: 1514822400, IN: 20, OUT: 20 }, // 时间戳是 2018年1月2日
+                { TIME: 1514908800, IN: 30, OUT: 30 }, // 时间戳是 2018年1月3日
+                { TIME: 1515254400, IN: 20, OUT: 40 }, // 时间戳是 2018年1月7日
+                { TIME: 1515340800, IN: 30, OUT: 50 }, // 时间戳是 2018年1月8日
+                { TIME: 1515600000, IN: 40, OUT: 60 }  // 时间戳是 2018年1月11日
+            ];
+            var fix = jc.spaceFix(time, {
+                key: "TIME",            // 补全依据的字段
+                start: 1514649600,      // 补全的开始点 时间戳是 2017年12月31日
+                end: 1515686400,        // 补全的结束点 时间戳是 2018年1月12日
+                space: 86400,           // 补全的间隔   86400代表一天
+                zeroFill: ["IN", "OUT"] // 需要补全的字段，补0
+            });
+            console.log(fix)
+            /* output: [
+                { TIME: 1514649600, IN: 0, OUT: 0 },
+                { TIME: 1514736000, IN: 10, OUT: 10 },
+                { TIME: 1514822400, IN: 20, OUT: 20 },
+                { TIME: 1514908800, IN: 30, OUT: 30 },
+                { TIME: 1514995200, IN: 0, OUT: 0 },
+                { TIME: 1515081600, IN: 0, OUT: 0 },
+                { TIME: 1515168000, IN: 0, OUT: 0 },
+                { TIME: 1515254400, IN: 20, OUT: 40 },
+                { TIME: 1515340800, IN: 30, OUT: 50 },
+                { TIME: 1515427200, IN: 0, OUT: 0 },
+                { TIME: 1515513600, IN: 0, OUT: 0 },
+                { TIME: 1515600000, IN: 40, OUT: 60 },
+                { TIME: 1515686400, IN: 0, OUT: 0 }
+            ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="extend" class="href"></div>
+          <h1><span class="father-title"></span>.extend</h1>
+          <div class="line"></div>
+          <p class="explain">jc.extend(type,target,object), 复制/合并。type是布尔类型，true为深度复制/合并，参数可忽略。target是目标对象，其他对象的成员属性将被附加到该对象上。object是被合并对象</p>
+          <p class="tip success-tip">该方法作者偷懒基本搬了jquery的extend方法过来，所以使用方法和jquery一样，搜索引擎可以查到。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var obj = {
+                  title: "for test",
+                  array: ["name", {
+                      name: "extend"
+                  }],
+                  obj: {
+                      name: "obj-test",
+                      other: "other"
+                  }
+              }
+              // 如果参入参数前面加true就会变成深度合并
+              var data = jc.extend(obj, {
+                  title: "success",
+                  array: [123],
+                  obj: {
+                      name: "success"
+                  },
+                  fn: function (params) {
+                      return params
+                  }
+              });
+              console.log(data);
+              /* output:{
+                  title: "success",
+                  array: [123],
+                  obj: {
+                      name: "success"
+                  },
+                  fn: function (params) {
+                      return params
+                  }
+              } */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="groupBy" class="href"></div>
+          <h1><span class="father-title"></span>.groupBy</h1>
+          <div class="line"></div>
+          <p class="explain">jc.groupBy(table, iteratee), 对数据进行分组操作, 也可以写作jc.group, iteratee的类型：string || array || function</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，第二个参数可以是string || array || function， function类型下回调参数是每一行的对象;array类型下可以根据多个键进行分组,function类型下return一个数组有同样效果</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 使用了文档开头的模拟数据
+              var group1 = jc.groupBy(table, function(row) {
+                return row.time
+              });
+
+              var group2 = jc.groupBy(table, "time");
+
+              var group3 = jc.groupBy(table, ["time"]);
+
+              console.log(group1);
+              console.log(group2);
+              console.log(group3);
+
+              /* same output: {
+                  "10月1日": [{ time: "10月1日", inPerson: 20, outPerson: 1000, region: "广州", fly: 12 },
+                      { time: "10月1日", inPerson: 13, outPerson: 900, region: "深圳", fly: 2 }
+                  ],
+                  "10月2日": [
+                      { time: "10月2日", inPerson: 15, outPerson: 900, region: "广州", fly: null },
+                      { time: "10月2日", inPerson: 15, outPerson: 1000, region: "深圳", fly: 0 }
+                  ],
+                  "10月3日": [
+                      { time: "10月3日", inPerson: 15, outPerson: 100, region: "广州" },
+                      { time: "10月3日", inPerson: 15, outPerson: 100, region: "深圳" }
+                  ],
+                  "10月4日": [
+                      { time: "10月4日", inPerson: 90, outPerson: 60, region: "广州" },
+                      { time: "10月4日", inPerson: 70, outPerson: 50, region: "深圳" }
+                  ],
+                  "10月5日": [
+                      { time: "10月5日", inPerson: 500, outPerson: 39, region: "广州" },
+                      { time: "10月5日", inPerson: 350, outPerson: 30, region: "深圳" }
+                  ],
+                  "10月6日": [
+                      { time: "10月6日", inPerson: 900, outPerson: 15, region: "广州" },
+                      { time: "10月6日", inPerson: 1000, outPerson: 15, region: "深圳" }
+                  ],
+                  "10月7日": [
+                      { time: "10月7日", inPerson: 900, outPerson: 10, region: "广州" },
+                      { time: "10月7日", inPerson: 1200, outPerson: 7, region: "深圳" }
+                  ]
+              } */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="where" class="href"></div>
+          <h1><span class="father-title"></span>.where</h1>
+          <div class="line"></div>
+          <p class="explain">jc.where(table, iteratee), 进行过滤操作，iteratee的类型： object || function</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据。 第二个参数可以是obj || function,function类型下回调参数是每一行的对象, 过滤出return 为true的数据;object类型使用{key1:"value1",key2:"value2"}的形式配置，过滤出包含该object的行</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [
+                { time: "10/1", mac: 10, win: 20 },
+                { time: "10/1", mac: 30, win: 20 },
+                { time: "10/1", mac: 45, win: 20 },
+                { time: "10/2", mac: 30, win: 3 }
+              ];
+              var data = jc.where(table, { mac: 30 });
+              console.log(data)
+               /* same output:[
+                { time: "10/1", mac: 30, win: 20 },
+                { time: "10/2", mac: 30, win: 3 }
+               ] */
+
+              var data = jc.where(table, function(row) {
+                  return row.time == "10/2" && row.mac == 30
+              });
+               console.log(data)
+               /* output:[
+                { time: "10/2", mac: 30, win: 3 }
+               ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="orderBy" class="href"></div>
+          <h1><span class="father-title"></span>.orderBy</h1>
+          <div class="line"></div>
+          <p class="explain">jc.orderBy(data, iteratee), 进行排序操作，, 也可以写作jc.order。iteratee的类型： object || function</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据。 第二个参数可以是obj || function,function类型下回调参数是left，right, 使用方式和原生js的sort一直;object类型使用{key1:"ASC",key2:"DESC"}的形式配置，ASC为升序，DESC为倒序</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [
+                  { TIME: 1, IN: 10, OUT: 10 },
+                  { TIME: 2, IN: 20, OUT: 20 },
+                  { TIME: 3, IN: 30, OUT: 30 },
+                  { TIME: 4, IN: 30, OUT: 40 }
+              ];
+              var order = jc.orderBy(table, {IN:"DESC", OUT:"ASC"});
+              console.log(order)
+              /* output: [
+                  { TIME: 3, IN: 30, OUT: 30 },
+                  { TIME: 4, IN: 30, OUT: 40 },
+                  { TIME: 2, IN: 20, OUT: 20 },
+                  { TIME: 1, IN: 10, OUT: 10 }
+              ] */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="limit" class="href"></div>
+          <h1><span class="father-title"></span>.limit</h1>
+          <div class="line"></div>
+          <p class="explain">jc.limit(data, iteratee), 返回指定的记录数, iteratee类型：number||array</p>
+          <p class="tip success-tip">number类型下限制条数。array类型下有两个参数，如[1,2]，第一个参数说明从下标1位置开始，第二个参数说明选择后面2条数据，用法类似MYSQL。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var data = [
+                  { TIME: 1, IN: 10, OUT: 10 },
+                  { TIME: 2, IN: 20, OUT: 20 },
+                  { TIME: 3, IN: 30, OUT: 30 },
+                  { TIME: 7, IN: 20, OUT: 40 },
+                  { TIME: 8, IN: 30, OUT: 50 },
+                  { TIME: 11, IN: 40, OUT: 60 }
+              ];
+              var limit = jc.limit(data, 2);
+              console.log(limit)
+               /* output: [
+                  { TIME: 1, IN: 10, OUT: 10 },
+                  { TIME: 2, IN: 20, OUT: 20 }
+              ]) */
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="max" class="href"></div>
+          <h1><span class="father-title"></span>.max</h1>
+          <div class="line"></div>
+          <p class="explain">jc.max(data, iteratee), 返回匹配到最大值所在的行, iteratee, 可选, 类型：string||function</p>
+          <p class="tip success-tip">string为要选择的列，function回调参数为源数据的行。该函数主要暂时用于补充jc.sql无法根据某字段最大值选择其他字段（如：某峰值发生的时间），不过已经纳入规划。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [5, NaN, undefined, null, 1]
+              var data = jc.max(table);
+              console.log(data)
+              // output: 5
+
+              var table2 = [
+                { time: "10/1", mac: 10, win: 20 },
+                { time: "10/1", mac: 30, win: 20 },
+                { time: "10/1", mac: 45, win: 20 },
+                { time: "10/1", mac: 20, win: 20 }
+              ];
+              var data2 = jc.min(table2, function (row) {
+                  return row.mac
+              });
+              console.log(data2);
+              // output: { time: "10/1", mac: 45, win: 20 };
+
+              var data3 = jc.max(table2, "mac");
+              console.log(data3);
+              // output: { time: "10/1", mac: 45, win: 20 };
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="min" class="href"></div>
+          <h1><span class="father-title"></span>.min</h1>
+          <div class="line"></div>
+          <p class="explain">jc.min(data, iteratee), 返回匹配到最小值所在的行, iteratee, 可选, 类型：string||function</p>
+          <p class="tip success-tip">string为要选择的列，function回调参数为源数据的行。该函数主要暂时用于补充jc.sql无法根据某字段最小值选择其他字段（如：某峰值发生的时间），不过已经纳入规划。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [5, NaN, undefined, null, 1]
+              var data = jc.min(table);
+              console.log(data)
+              // output: 1
+
+              var table2 = [
+                  { time: "10/1", mac: 10, win: 20 },
+                  { time: "10/1", mac: 30, win: 20 },
+                  { time: "10/1", mac: 45, win: 2 }
+              ]
+              var data2 = jc.min(table2, "mac");
+              console.log(data2)
+              // output: { time: "10/1", mac: 10, win: 20 };
+
+              var data3 = jc.min(table2, "mac");
+              console.log(data3)
+               // output: { time: "10/1", mac: 10, win: 20 };
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="map" class="href"></div>
+          <h1><span class="father-title"></span>.map</h1>
+          <div class="line"></div>
+          <p class="explain">jc.map(data, iteratee), 遍历数组, iteratee类型：function</p>
+          <p class="tip success-tip">和原生map用法一致，做了容错处理，传入非数组类型直接返回空数组。iteratee对应的回调参数是row和i。i是index的意思，对应数组下标</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = [1, 2, 3, 4];
+              jc.map(table, function (row, i) {
+                console.log(row, i)
+              });
+              // output: 1, 0
+              // output: 2, 1
+              // output: 3, 2
+              // output: 4, 3
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="forIn" class="href"></div>
+          <h1><span class="father-title"></span>.forIn</h1>
+          <div class="line"></div>
+          <p class="explain">jc.forIn(data, iteratee), 遍历对象, iteratee类型：function</p>
+          <p class="tip success-tip">对原生for in的封装。iteratee的回调函数是key,val,i。对比原生方法多了一个i, i对应和map的i是一致的，可能对大家来说可能不合理，但我希望有这么一个东西。大家不喜欢可以不用，这不是bug。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              var table = {
+                a: 1,
+                b: 2,
+                c: 3,
+                d: 4,
+              };
+              jc.forIn(table, function (key, val, i) {
+                console.log(key, val)
+              });
+              // output: a, 1, 0
+              // output: b, 2, 1
+              // output: c, 3, 2
+              // output: d, 4, 3
+            </code>
+          </pre>
+        </li>
+        <li class="node">
+          <div id="judge" class="href"></div>
+          <h1><span class="father-title"></span>类型判断相关</h1>
+          <div class="line"></div>
+          <p class="explain">判断类型，返回true或者false</p>
+          <p class="text-row">jc.isArray(data)：判断数组</p>
+          <p class="text-row">jc.isObject(data)：判断普通对象</p>
+          <p class="text-row">jc.isObjEmpty(data)：判断对象为空值,{}</p>
+          <p class="text-row">jc.isString(data)：判断字符</p>
+          <p class="text-row">jc.isNumber(data)：判断数组</p>
+          <p class="text-row">jc.isFunction(data)：判断函数</p>
+          <p class="text-row">jc.isDate(data)：判断日期</p>
+          <p class="text-row">jc.isRegExp(data)：判断正则</p>
+          <p class="text-row">jc.isUndefined(data)：判断undefined</p>
+          <p class="text-row">jc.isNoVal(data)： 判断空值，即undefined, NaN或者null</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+<script src="../public/js/zepto.min.js"></script>
+<script src="../public/js/prism.js"></script>
+<script>
+  $(".dot").click(function(){
+    if($(this).hasClass("dot-left")){
+      $(this).removeClass("dot-left").addClass("dot-bottom");
+    }else{
+      $(this).removeClass("dot-bottom").addClass("dot-left");
+    }
+    $(this).siblings(".category-list").toggle()
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <title>JCalculator</title>
+  <link rel="stylesheet" href="../public/css/base.css">
+  <link rel="stylesheet" href="../public/css/prism.css">
+  <link rel="stylesheet" href="../public/css/example.css">
+</head>
+<body>
+  <header>
+    <img class="logo" src="../public/img/logo.png" alt="logo">
+    <nav class="nav">
+      <ul>
+        <li class="nav-item"><a href="../index.html">主页</a></li>
+        <li class="nav-item"><a href="./doc.html">文档</a></li>
+        <li class="nav-item active">示例</li>
+      </ul>
+    </nav>
+  </header>
+  <div class = "container clearfix">
+    <aside class = "left">
+    </aside>
+    <section class = "main">
+      <ul class = "node-list">
+        <li class="node">
+          <h1>多个条件排序</h1>
+          <p class="explain">JCalculator支持根据多个条件进行排序。orderBy是在对象类型的时候会按顺排序。想要更加自由的排序方式可以用function类型,回调参数是left，right，与原生sort函数用法类似</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 根据name和shopID分组计算sell的总和
+              var data = [
+                { type: 1, win: 20, mac: 13, linux: 10 },
+                { type: 1, win: 13, mac: 3, linux: 10 },
+                { type: 2, win: 9, mac: 5, linux: 4 },
+                { type: 2, win: 19, mac: 32, linux: 10 },
+                { type: 3, win: 14, mac: 5, linux: 8 },
+                { type: 3, win: 20, mac: 13, linux: 1 },
+                { type: 4, win: 0, mac: 7, linux: 6 },
+              ];
+              var order = jc.sql({
+                select: {
+                  col: {
+                    all: function (row) {
+                      return row.win + row.mac + row.linux
+                    },
+                    type: "type"
+                  }
+                },
+                from: data,
+                orderBy: {type: "DESC", all: "ASC" }
+              });
+              /* output: [
+                {"all": 13, "type": 4},
+                {"all": 27, "type": 3},
+                {"all": 34, "type": 3},
+                {"all": 18, "type": 2},
+                {"all": 61, "type": 2},
+                {"all": 26, "type": 1},
+                {"all": 43, "type": 1}
+              ]
+            </code>
+          </pre>
+        </li>
+      </ul>
+    </section>
+  </div>
+<script src="../public/js/zepto.min.js"></script>
+<script src="../public/js/JCalculator.js"></script>
+<script src="../public/js/example.js"></script>
+<script src="../public/js/prism.js"></script>
+<script>
+  $(function () {
+    var html = "";
+    var page = "order";
+    var active = ""
+    jc.forIn(nav,function (key,val) {
+      active = page != key ? "" : "active";
+      html += '<a class = "menu '+ active +'" href = "'+ val.url +'">'+ val.text+'</a>' 
+    });
+    $(".left").html(html);
+  })
+</script>
+</body>
+</html>

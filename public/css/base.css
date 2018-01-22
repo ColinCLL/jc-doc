@@ -1,0 +1,236 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td { margin:0; padding:0; }
+body { background:#fff; color:#555; font-size:14px; font-family: Verdana, Arial, Helvetica, sans-serif; }
+td,th,caption { font-size:14px; }
+h1, h2, h3, h4, h5, h6 { font-weight:normal; font-size:100%; }
+address, caption, cite, code, dfn, em, strong, th, var { font-style:normal; font-weight:normal;}
+a { color:#555; text-decoration:none; }
+a:hover { text-decoration:underline; }
+img { border:none; }
+ol,ul,li { list-style:none; }
+input, textarea, select, button { font:14px Verdana,Helvetica,Arial,sans-serif; }
+table { border-collapse:collapse; }
+html {overflow-y: scroll;} 
+
+.clearfix:after {content: "."; display: block; height:0; clear:both; visibility: hidden;}
+.clearfix { *zoom:1; }
+
+
+/* 基础样式 */
+html{
+	height: 100%;
+	/*overflow: hidden;*/
+}
+
+a{
+	cursor:pointer;
+}
+header{
+	position: fixed;
+	height: 40px;
+    width: 100%;
+    top: 0;
+	background: #fff;
+	z-index: 999;
+	box-shadow: 0 0 2px rgba(0,0,0,0.25);
+}
+header .logo{
+	height: 40px;
+	display: inline-block;
+	margin-left: 80px;
+}
+
+.nav{
+	position: fixed;
+	top:5px;
+	right: 20px;
+	display: inline-block;
+	height: 29px;
+	text-align: center;
+	font-size: 16px;
+	color: #555555;
+
+}
+
+.nav ul{
+	margin:auto;
+}
+.nav .nav-item{
+	cursor:pointer;
+	display: inline-block;
+	height: 26px;
+	padding:4px 10px;
+	margin:0 8px;
+	font-family: '黑体';
+	vertical-align: top;
+}
+.nav-item a {
+	text-decoration:none;
+	}
+.nav .nav-item.active,.nav .nav-item:hover{
+	color:#222;
+	border-bottom:2px solid #52c41a; 
+}
+
+.menu {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 10px 5px;
+	text-align: center;
+}
+
+.container{
+	margin-top: 40px;
+	padding: 0 0 0 260px;}
+.container .main{
+	width: 100%;
+	float: left;
+	overflow:auto;
+	background: #f8f8f8;
+}
+.container .left{
+	position: fixed;
+	width: 260px;
+	height: 100%;
+	border-right: 1px solid #ccc;
+	left: 0px;
+	overflow: auto;
+	background: #f8f8f8;
+
+}
+.list .list-title{
+	margin-top: 20px;
+	padding-left:20px;
+	font-size: 20px;
+	font-family: "黑体";
+	font-weight: 800;
+}
+.list .category{
+	margin-top: 10px;
+	padding-left:35px;
+
+}
+.list .category.active p,.category:hover p{
+	cursor:pointer;
+	font-size: 16px;
+	font-weight: 600;
+}
+/* .list .category-list{
+	display: none;
+} */
+.list .active .category-list{
+	display: block;
+}
+.list .question{
+	margin: 5px 0;
+	padding-left:20px;
+	font-size: 14px;
+}
+
+.main .explain{
+	margin: 20px 50px 
+}
+.main .text-row{
+	margin-left:75px;
+	padding: 2px;
+	height: 18px;
+	line-height: 16px;
+	font-size: 14px;
+}
+.main .line{
+	margin: 0 50px; 
+}
+.main .pic{
+	display: block;
+	max-width:80%;
+	border:7px solid #ccc;
+	margin: 0 auto;
+}
+.main .show-code{
+	margin: 20px 50px;
+	border-radius: 5px;
+}
+.href{
+	height: 40px;
+}
+h1{
+	margin: 20px 0 20px 50px;
+	font-size: 25px;
+	font-family: "黑体";
+	font-weight: 700;
+}
+h2{
+	margin-left:75px;
+	font-size: 20px;
+	font-family: "黑体";
+}
+h6{
+	margin: 5px 0 5px 75px;
+	font-size: 12px;
+	color:#888;
+}
+.father-title{
+	font-size: 18px;
+	color: #aaa;
+}
+.dot{
+	position: relative;
+	vertical-align: center;
+	cursor: pointer;	
+}
+.dot:after, .dot:before {
+  border: 6px solid transparent;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 4px;
+  content: ' '
+}
+.dot.dot-left:after, .dot.dot-left:before {
+	right: 2px;
+  border-left: 6px solid #f8f8f8;
+}
+
+.dot.dot-bottom:after, .dot.dot-bottom:before {
+	right: 6px;
+  border-top: 6px solid #f8f8f8;
+}
+
+.dot.dot-left:before{
+  border-left-color: #5A5E66;
+  right: 1px;
+}
+.dot.dot-bottom:before {
+  border-top-color: #5A5E66;
+  top: 5px;
+  right: 6px;
+}
+
+
+
+/*功能性组件样式*/
+
+.chart{
+	margin: 20px 50px;
+	height: 300px;
+}
+
+.tip{
+	margin: 20px 50px 20px 50px;
+	padding: 10px;
+	border-radius: 5px;
+	background: #e8e8e8;
+}
+.success-tip{
+	color: #52c41a;
+}
+.warning-tip{
+	color: #ff4d4f;
+}
+.hide{
+	display: none;
+}
+.line{
+	border-top:1px solid #ccc; 
+	height: 0;
+}

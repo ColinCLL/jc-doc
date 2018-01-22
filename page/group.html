@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <title>JCalculator</title>
+  <link rel="stylesheet" href="../public/css/base.css">
+  <link rel="stylesheet" href="../public/css/prism.css">
+  <link rel="stylesheet" href="../public/css/example.css">
+</head>
+<body>
+  <header>
+    <img class="logo" src="../public/img/logo.png" alt="logo">
+    <nav class="nav">
+      <ul>
+        <li class="nav-item"><a href="../index.html">主页</a></li>
+        <li class="nav-item"><a href="./doc.html">文档</a></li>
+        <li class="nav-item active">示例</li>
+      </ul>
+    </nav>
+  </header>
+  <div class = "container clearfix">
+    <aside class = "left">
+    </aside>
+    <section class = "main">
+      <ul class = "node-list">
+        <li class="node">
+          <h1>多个条件分组</h1>
+          <p class="explain">JCalculator支持根据多个条件进行分组。groupBy支持array数组形式分组，甚至可以写成["string", function(row){}]这种形式。也可以groupBy本身就是一个function，回调参数是row,可以通过return一个数组实现多条件分组</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 根据name和shopID分组计算sell的总和
+              var data = [
+                { name: "apple", sell: 15, shopID: 2 },
+                { name: "apple", sell: 5, shopID: 2 },
+                { name: "apple", sell: 5, shopID: 3 },
+                { name: "banana", sell: 4, shopID: 3 },
+                { name: "banana", sell: 5, shopID: 3 },
+                { name: "banana", sell: 2, shopID: 4 }
+              ];
+
+              var group = jc.sql({
+                select: {
+                  col: ["name", "shopID"],
+                  sum: "sell"
+                },
+                from: data,
+                groupBy: ["name", "shopID"],
+              });
+              console.log(group);
+              /* output: [
+                {"name":"apple","shopID":2,"sum_sell":20},
+                {"name":"apple","shopID":3,"sum_sell":5},
+                {"name":"banana","shopID":3,"sum_sell":9},
+                {"name":"banana","shopID":4,"sum_sell":2}
+              ]*/
+            </code>
+          </pre>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 根据name和单双周计算sell的总和
+              var data = [
+                { name: "apple", sell: 15, week: 2 },
+                { name: "apple", sell: 5, week: 3 },
+                { name: "apple", sell: 13, week: 4 },
+                { name: "apple", sell: 3, week: 5 },
+                { name: "banana", sell: 4, week: 2 },
+                { name: "banana", sell: 5, week: 3 },
+                { name: "banana", sell: 2, week: 4 },
+                { name: "banana", sell: 2, week: 5 }
+              ];
+
+              // 计算单双周的函数
+              function weekType(row) {
+                return row.week % 2
+              }
+
+              var group = jc.sql({
+                select: {
+                  col: {
+                    name: "name",
+                    weekType: weekType,
+                  },
+                  sum: "sell"
+                },
+                from: data,
+                groupBy: ["name", weekType],
+              });
+              console.log(group);
+              /* output: [
+                {"name":"apple","weekType":0,"sum_sell":28},
+                {"name":"apple","weekType":1,"sum_sell":8},
+                {"name":"banana","weekType":0,"sum_sell":6},
+                {"name":"banana","weekType":1,"sum_sell":7}
+              ]*/
+            </code>
+          </pre>
+        </li>
+      </ul>
+    </section>
+  </div>
+<script src="../public/js/zepto.min.js"></script>
+<script src="../public/js/JCalculator.js"></script>
+<script src="../public/js/example.js"></script>
+<script src="../public/js/prism.js"></script>
+<script>
+  $(function () {
+    var html = "";
+    var page = "group";
+    var active = ""
+    jc.forIn(nav,function (key,val) {
+      active = page != key ? "" : "active";
+      html += '<a class = "menu '+ active +'" href = "'+ val.url +'">'+ val.text+'</a>' 
+    });
+    $(".left").html(html);
+  })
+</script>
+</body>
+</html>

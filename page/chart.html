@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <title>JCalculator</title>
+  <link rel="stylesheet" href="../public/css/base.css">
+  <link rel="stylesheet" href="../public/css/prism.css">
+</head>
+<body>
+  <header>
+    <img class="logo" src="../public/img/logo.png" alt="logo">
+    <nav class="nav">
+      <ul>
+        <li class="nav-item"><a href="../index.html">主页</a></li>
+        <li class="nav-item"><a href="./doc.html">文档</a></li>
+        <li class="nav-item active">示例</li>
+      </ul>
+    </nav>
+  </header>
+  <div class = "container clearfix">
+    <aside class = "left">
+    </aside>
+    <section class = "main">
+      <ul class = "node-list">
+        <li class="node">
+          <h1>处理图表数据</h1>
+          <p class="explain">数据从数据库出来到可以填入并生成图表,比如echarts,height chart等自身不带数据聚合功能的图表库,会涉及很多复杂的数据处理,使用JCalculator会使这些操作更加简单,进行图表二次封装的时候更加轻松且逻辑清晰。这是我并不是对图表封装，只是展示一些数据处理过程。这里以echarts3.X为例。这里的例子是我往相对复杂的写，可能有些项目实际情况可能没有这么复杂，但我个人情况是比这个例子复杂的。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 数据：终端访问量/天。模拟直接从数据库查出来的数据。
+              // 通过这个数据生成总的终端访问比例饼图。
+              var data = [
+                { day: 1, win: 20, mac: 13, linux: 10 },
+                { day: 2, win: 13, mac: 3, linux: 10 },
+                { day: 3, win: 9, mac: 5, linux: 4 },
+                { day: 4, win: 19, mac: 32, linux: 10 },
+                { day: 5, win: 14, mac: 5, linux: 8 },
+                { day: 6, win: 20, mac: 13, linux: 1 },
+                { day: 7, win: 0, mac: 7, linux: 6 },
+              ];
+
+              // 加法运算
+              var sum = jc.sql({
+                select: {
+                  sum:{
+                    win: "win",
+                    mac: "mac",
+                    linux: "linux"
+                  }
+                },
+                from: data,
+              });
+              console.log(sum);
+              /* output: [{"win":95,"mac":78,"linux":49}]*/
+
+              // 对应到echarts上需要拆分字段。
+              var pieData = jc.keyBreak(sum, {
+                break:["win", "mac", "linux"],
+                key: "name",
+                value: "value"
+              })
+              console.log(pieData);
+               /* output: [
+                {"name":"win","value":95},
+                {"name":"mac","value":78},
+                {"name":"linux","value":49}
+              ]*/
+              
+              // 应用到图例上需要取得name这一列形成数组
+              var legend = jc.keyArray(pieData, ["name"]);
+              console.log(legend);
+               /* output: {
+                 "name":["win","mac","linux"]
+              }*/
+
+              var pieOption = {
+                color: ["#6699CC","#9966FF","#33FF99"],
+                tooltip: {
+                  formatter: "{b} : {c} ({d}%)"
+                },
+                legend: {
+                  top:40,
+                  left: 'center',
+                  data: legend.name  //传入图例
+                },
+                series: [
+                  {
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    data: pieData // 传入数据
+                  }
+                ]
+              };
+              var pieChart = echarts.init(document.getElementById('pieChart'));
+              pieChart.setOption(pieOption);
+            </code>
+          </pre>
+          <div id = "pieChart"  class = "chart"></div>
+
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 数据：终端访问量/天。模拟直接从数据库查出来的半个月数据。
+              // 因为网站升级关闭，或无访客，或设备故障等原因无访客导致缺失数据。
+              // 通过这个数据生成总的终端访问趋势图。
+              var data = [
+                { day: 1, win: 20, mac: 13, linux: 10 },
+                { day: 2, win: 13, mac: 3, linux: 10 },
+                { day: 5, win: 14, mac: 5, linux: 8 },
+                { day: 6, win: 20, mac: 13, linux: 1 },
+                { day: 7, win: 0, mac: 7, linux: 6 },
+                { day: 10, win: 9, mac: 5, linux: 4 },
+                { day: 12, win: 19, mac: 32, linux: 10 },
+                { day: 13, win: 9, mac: 5, linux: 4 }
+              ];
+              
+              // 补全数据，避免趋势图时间间隔不相等造成误差。
+              var data = jc.spaceFix(data, {
+                key: "day",
+                start: 1, // 开始的点
+                end: 15,  // 结束的点
+                space: 1, // 间隔
+                zeroFill: ["win", "mac", "linux"] // 补零的字段
+              });
+              console.log(data);
+              /* output: [
+                {"day":1,"win":20,"mac":13,"linux":10},
+                {"day":2,"win":13,"mac":3,"linux":10},
+                {"day":3,"win":0,"mac":0,"linux":0},
+                {"day":4,"win":0,"mac":0,"linux":0},
+                {"day":5,"win":14,"mac":5,"linux":8},
+                {"day":6,"win":20,"mac":13,"linux":1},
+                {"day":7,"win":0,"mac":7,"linux":6},
+                {"day":8,"win":0,"mac":0,"linux":0},
+                {"day":9,"win":0,"mac":0,"linux":0},
+                {"day":10,"win":9,"mac":5,"linux":4},
+                {"day":11,"win":0,"mac":0,"linux":0},
+                {"day":12,"win":19,"mac":32,"linux":10},
+                {"day":13,"win":9,"mac":5,"linux":4},
+                {"day":14,"win":0,"mac":0,"linux":0},
+                {"day":15,"win":0,"mac":0,"linux":0}
+              ]*/
+
+              var lineData = jc.keyArray(data, ["day", "win", "mac", "linux"]);
+              console.log(lineData);
+              /* output: {
+                "day":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+                "win":[20,13,0,0,14,20,0,0,0,9,0,19,9,0,0],
+                "mac":[13,3,0,0,5,13,7,0,0,5,0,32,5,0,0],
+                "linux":[10,10,0,0,8,1,6,0,0,4,0,10,4,0,0]
+              }*/
+
+              var legend = [];
+              var x = [];
+              var series = [];
+              jc.forIn(lineData, function (key, val, obj) {
+                if (key == "day") {
+                  x = val;
+                } else {
+                  legend.push(key);
+
+                  series.push({
+                    name:key,
+                    type:'line',
+                    areaStyle: {normal: {}},
+                    data:val
+                  })
+                }
+              })  
+
+              // echarts本身所需配置
+              var lineOption = {
+                tooltip : {
+                  trigger: 'axis',
+                  axisPointer: {
+                    type: 'cross',
+                    label: {
+                      backgroundColor: '#6a7985'
+                    }
+                  }
+                },
+                legend: {
+                  data: legend //传入图例
+                },
+                grid: {
+                  left: '3%',
+                  right: '4%',
+                  bottom: '3%',
+                  containLabel: true
+                },
+                xAxis : [
+                  {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : x // 传入X
+                  }
+                ],
+                yAxis : [
+                  {
+                    type : 'value'
+                  }
+                ],
+                series : series // 传入系列
+              };
+              var lineChart = echarts.init(document.getElementById('lineChart'));
+              pieChart.setOption(lineOption);
+            </code>
+          </pre>
+          <div id = "lineChart" class = "chart"></div>
+        </li>
+      </ul>
+    </section>
+  </div>
+<script src="../public/js/zepto.min.js"></script>
+<script src="../public/js/JCalculator.js"></script>
+<script src="../public/js/example.js"></script>
+<script src="../public/js/prism.js"></script>
+<script src="../public/js/echarts.min.js"></script>
+<script>
+  $(function () {
+    var html = "";
+    var page = "chart";
+    var active = ""
+    jc.forIn(nav,function (key,val) {
+      active = page != key ? "" : "active";
+      html += '<a class = "menu '+ active +'" href = "'+ val.url +'">'+ val.text+'</a>' 
+    });
+    $(".left").html(html);
+
+    // 数据：终端访问量/天。通过这个数据生成总的终端访问比例饼图。
+    var data = [
+      { day: 1, win: 20, mac: 13, linux: 10 },
+      { day: 2, win: 13, mac: 3, linux: 10 },
+      { day: 3, win: 9, mac: 5, linux: 4 },
+      { day: 4, win: 19, mac: 32, linux: 10 },
+      { day: 5, win: 14, mac: 5, linux: 8 },
+      { day: 6, win: 20, mac: 13, linux: 1 },
+      { day: 7, win: 0, mac: 7, linux: 6 },
+    ];
+
+    // 加法运算
+    var sum = jc.sql({
+      select: {
+        sum: {
+          win: "win",
+          mac: "mac",
+          linux: "linux"
+        }
+      },
+      from: data,
+    });
+    console.log(sum);
+    /* output: [{"win":95,"mac":78,"linux":49}]*/
+
+    // 对应到echarts上需要拆分字段。
+    var pieData = jc.keyBreak(sum, {
+      break: ["win", "mac", "linux"],
+      key: "name",
+      value: "value"
+    })
+    console.log(pieData);
+    /* output: [
+     {"name":"win","value":95},
+     {"name":"mac","value":78},
+     {"name":"linux","value":49}
+    ]*/
+
+    // 应用到图例上需要取得name这一列形成数组
+    var legend = jc.keyArray(pieData, ["name"]);
+    console.log(legend);
+    /* output: {
+      "name":["win","mac","linux"]
+    }*/
+
+    var pieOption = {
+      color: ["#6699CC","#9966FF","#33FF99"],
+      tooltip: {
+        formatter: "{b} : {c} ({d}%)"
+      },
+      legend: {
+        top:40,
+        left: 'center',
+        data: legend.name  //传入图例
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: pieData // 传入数据
+        }
+      ]
+    };
+    var pieChart = echarts.init(document.getElementById('pieChart'));
+    pieChart.setOption(pieOption);
+
+
+    // 数据：终端访问量/天。模拟直接从数据库查出来的半个月数据。
+    // 因为网站升级关闭，或无访客，或设备故障等原因无访客导致缺失数据。
+    // 通过这个数据生成总的终端访问趋势图。
+    var data = [
+      { day: 1, win: 20, mac: 13, linux: 10 },
+      { day: 2, win: 13, mac: 3, linux: 10 },
+      { day: 5, win: 14, mac: 5, linux: 8 },
+      { day: 6, win: 20, mac: 13, linux: 1 },
+      { day: 7, win: 0, mac: 7, linux: 6 },
+      { day: 10, win: 9, mac: 5, linux: 4 },
+      { day: 12, win: 19, mac: 32, linux: 10 },
+      { day: 13, win: 9, mac: 5, linux: 4 }
+    ];
+
+    // 补全数据，避免趋势图时间间隔不相等造成误差。
+    var data = jc.spaceFix(data, {
+      key: "day",
+      start: 1, // 开始的点
+      end: 15,  // 结束的点
+      space: 1, // 间隔
+      zeroFill: ["win", "mac", "linux"] // 补零的点
+    });
+    console.log(data);
+    /* output: [
+      {"day":1,"win":20,"mac":13,"linux":10},
+      {"day":2,"win":13,"mac":3,"linux":10},
+      {"day":3,"win":0,"mac":0,"linux":0},
+      {"day":4,"win":0,"mac":0,"linux":0},
+      {"day":5,"win":14,"mac":5,"linux":8},
+      {"day":6,"win":20,"mac":13,"linux":1},
+      {"day":7,"win":0,"mac":7,"linux":6},
+      {"day":8,"win":0,"mac":0,"linux":0},
+      {"day":9,"win":0,"mac":0,"linux":0},
+      {"day":10,"win":9,"mac":5,"linux":4},
+      {"day":11,"win":0,"mac":0,"linux":0},
+      {"day":12,"win":19,"mac":32,"linux":10},
+      {"day":13,"win":9,"mac":5,"linux":4},
+      {"day":14,"win":0,"mac":0,"linux":0},
+      {"day":15,"win":0,"mac":0,"linux":0}
+    ]*/
+
+    var lineData = jc.keyArray(data, ["day", "win", "mac", "linux"]);
+    console.log(lineData);
+    /* output: {
+      "day":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+      "win":[20,13,0,0,14,20,0,0,0,9,0,19,9,0,0],
+      "mac":[13,3,0,0,5,13,7,0,0,5,0,32,5,0,0],
+      "linux":[10,10,0,0,8,1,6,0,0,4,0,10,4,0,0]
+    }*/
+
+    var legend = [];
+    var x = [];
+    var series = [];
+    jc.forIn(lineData, function (key, val, obj) {
+      if (key == "day") {
+        x = val;
+      } else {
+        legend.push(key);
+        series.push({
+          name: key,
+          stack: '总量',
+          type: 'line',
+          areaStyle: { normal: {} },
+          data: val
+        });
+      }
+    })
+
+    // echarts本身所需配置
+    var lineOption = {
+      color: ["#6699CC", "#9966FF", "#33FF99"],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        }
+      },
+      legend: {
+        top: 20,
+        data: legend //传入图例
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: x // 传入X
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: series // 传入系列
+    };
+    console.log(lineOption)
+    var lineChart = echarts.init(document.getElementById('lineChart'));
+    lineChart.setOption(lineOption);
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <title>JCalculator</title>
+  <link rel="stylesheet" href="../public/css/base.css">
+  <link rel="stylesheet" href="../public/css/prism.css">
+  <link rel="stylesheet" href="../public/css/example.css">
+</head>
+<body>
+  <header>
+    <img class="logo" src="../public/img/logo.png" alt="logo">
+    <nav class="nav">
+      <ul>
+        <li class="nav-item"><a href="../index.html">主页</a></li>
+        <li class="nav-item"><a href="./doc.html">文档</a></li>
+        <li class="nav-item active">示例</li>
+      </ul>
+    </nav>
+  </header>
+  <div class = "container clearfix">
+    <aside class = "left">
+    </aside>
+    <section class = "main">
+      <ul class = "node-list">
+        <li class="node">
+          <h1>简单left join实现</h1>
+          <p class="explain">JCalculator本身并没有提供left join这个接口，我实践中绝大多数都是在数据库就完成这步了。但数据库也有可能存在一个库是oracel,一个是mysql的情况，两个库同时用。一份数据从oracle出来，一份数据从mysql出来，无法关联。所有还是有必要给出一个这样的demo。</p>
+          <pre class="show-code">
+            <code class="language-javascript">
+              // 商店ID关联数据
+              var left = [
+                { id: 1, name: "apple", price: 5, shopID: 2 },
+                { id: 2, name: "banana", price: 3, shopID: 3 }
+              ];
+
+              var right = [
+                { id: 1, name: "othersShop", tel: "1317866765" },
+                { id: 2, name: "appleShop", tel: "1246531231" },
+                { id: 3, name: "bananaShop", tel: "124512551" }
+              ];
+
+              //转成对象，类似数据库根据ID建立索引的功能，理解数据逻辑和性能上这都更好
+              var rightIndex = {};
+
+              jc.map(right, function (row) {
+                rightIndex[row.id] = row
+              })
+              console.log(rightIndex)
+              /* output: {
+                 "1":{"id":1,"name":"othersShop","tel":"1317866765"},
+                 "2":{"id":2,"name":"appleShop","tel":"1246531231"},
+                 "3":{"id":3,"name":"bananaShop","tel":"124512551"}
+                }*/
+              
+              var leftJoin = jc.sql({
+                select: {
+                  col: {
+                    name: "name",
+                    price: function (row) {
+                      return row.price + "$";
+                    },
+                    shopName: function (row) {
+                      var rightRow = rightIndex[row.shopID];
+                      return rightRow.name;
+                    },
+                    tel: function (row) {
+                      var rightRow = rightIndex[row.shopID];
+                      return rightRow.tel;
+                    }
+                  }
+                },
+                from: left
+              });
+              console.log(leftJoin);
+              /* output: [
+                {"name":"apple","price":"5$","shopName":"appleShop","tel":"1246531231"},
+                {"name":"banana","price":"3$","shopName":"bananaShop","tel":"124512551"}
+              ]*/
+            </code>
+          </pre>
+        </li>
+      </ul>
+    </section>
+  </div>
+<script src="../public/js/zepto.min.js"></script>
+<script src="../public/js/JCalculator.js"></script>
+<script src="../public/js/example.js"></script>
+<script src="../public/js/prism.js"></script>
+<script>
+  $(function () {
+    var html = "";
+    var page = "leftJoin";
+    var active = ""
+    jc.forIn(nav,function (key,val) {
+      active = page != key ? "" : "active";
+      html += '<a class = "menu '+ active +'" href = "'+ val.url +'">'+ val.text+'</a>' 
+    });
+    $(".left").html(html);
+  })
+</script>
+</body>
+</html>
