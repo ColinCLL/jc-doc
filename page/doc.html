@@ -113,7 +113,7 @@
           <pre class="show-code">
             <code class="language-javascript">
               // 模拟数据：模拟国庆7天深圳广州人流量数据，下面所有代码示例都将
-              // sql方法都使用该模拟数据，不再一一列出，我知道这样不好，允许我偷个懒，欢迎PR
+              // sql方法都使用该模拟数据，不再一一列出，我知道这样不好，允许我偷个懒，闲了再优化。
               var table = [
               {time:"10月1日", inPerson:20, outPerson:1000, region: "广州",fly:12},
               {time:"10月1日", inPerson:13, outPerson:900, region: "深圳",fly:2},
@@ -781,46 +781,35 @@
           <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据，第二个参数可以是string || array || function， function类型下回调参数是每一行的对象;array类型下可以根据多个键进行分组,function类型下return一个数组有同样效果</p>
           <pre class="show-code">
             <code class="language-javascript">
-              // 使用了文档开头的模拟数据
-              var group1 = jc.groupBy(table, function(row) {
-                return row.time
+              var data = [
+                  { name: "apple", sell: 15, week: 2 },
+                  { name: "apple", sell: 5, week: 3 },
+                  { name: "apple", sell: 13, week: 4 },
+                  { name: "apple", sell: 3, week: 5 },
+                  { name: "banana", sell: 4, week: 2 },
+                  { name: "banana", sell: 5, week: 3 },
+                  { name: "banana", sell: 2, week: 4 },
+                  { name: "banana", sell: 2, week: 5 }
+              ];
+
+              var group = jc.groupBy(data, "name");
+              var group = jc.groupBy(data, ["name"]);
+              var group = jc.groupBy(data, function (row) {
+                return row.name
               });
-
-              var group2 = jc.groupBy(table, "time");
-
-              var group3 = jc.groupBy(table, ["time"]);
-
-              console.log(group1);
-              console.log(group2);
-              console.log(group3);
-
+              console.log(group);
               /* same output: {
-                  "10月1日": [{ time: "10月1日", inPerson: 20, outPerson: 1000, region: "广州", fly: 12 },
-                      { time: "10月1日", inPerson: 13, outPerson: 900, region: "深圳", fly: 2 }
+                  apple:[
+                      { name: "apple", sell: 15, week: 2 },
+                      { name: "apple", sell: 5, week: 3 },
+                      { name: "apple", sell: 13, week: 4 },
+                      { name: "apple", sell: 3, week: 5 },
                   ],
-                  "10月2日": [
-                      { time: "10月2日", inPerson: 15, outPerson: 900, region: "广州", fly: null },
-                      { time: "10月2日", inPerson: 15, outPerson: 1000, region: "深圳", fly: 0 }
-                  ],
-                  "10月3日": [
-                      { time: "10月3日", inPerson: 15, outPerson: 100, region: "广州" },
-                      { time: "10月3日", inPerson: 15, outPerson: 100, region: "深圳" }
-                  ],
-                  "10月4日": [
-                      { time: "10月4日", inPerson: 90, outPerson: 60, region: "广州" },
-                      { time: "10月4日", inPerson: 70, outPerson: 50, region: "深圳" }
-                  ],
-                  "10月5日": [
-                      { time: "10月5日", inPerson: 500, outPerson: 39, region: "广州" },
-                      { time: "10月5日", inPerson: 350, outPerson: 30, region: "深圳" }
-                  ],
-                  "10月6日": [
-                      { time: "10月6日", inPerson: 900, outPerson: 15, region: "广州" },
-                      { time: "10月6日", inPerson: 1000, outPerson: 15, region: "深圳" }
-                  ],
-                  "10月7日": [
-                      { time: "10月7日", inPerson: 900, outPerson: 10, region: "广州" },
-                      { time: "10月7日", inPerson: 1200, outPerson: 7, region: "深圳" }
+                  banana:[
+                      { name: "banana", sell: 4, week: 2 },
+                      { name: "banana", sell: 5, week: 3 },
+                      { name: "banana", sell: 2, week: 4 },
+                      { name: "banana", sell: 2, week: 5 }
                   ]
               } */
             </code>
