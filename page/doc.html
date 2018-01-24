@@ -480,8 +480,8 @@
           <h1><span class="father-title">.query</span>.orderBy</h1>
           <div class="line"></div>
           <p class="explain">jc.sql(query) 中 query.orderBy, 对数据进行排序操作, 类型：obj||function</p>
-          <p class="tip success-tip">obj类型下可以这样使用{key:"desc"},也可以是大写。那么将会数据中键为key的值进行排序。function类型下回调的函数的参数为(left, right)使用方法类似原生sort。</p>
-          <p class="tip warning-tip">obj类型下值不是"desc"或"DESC"都会被默认为"ASC",顺序。且对象形态下目前只能用于数字排序，汉字英文之类的排序请在function自由发挥。orderBy计算顺序在select之后，数据已经变成新构造的数据，那么操作数据的时候就要用新的键名</p>
+          <p class="tip success-tip">obj类型下可以这样使用{key:"desc"}，desc代表降序（从大到小），asc代表升序（从小到大）,大小写都可以，不支持混合大小写使用。那么将会数据中键为key的值进行排序。function类型下回调的函数的参数为(left, right)使用方法类似原生sort。</p>
+          <p class="tip warning-tip">obj类型下值不是"desc"或"DESC"都会被默认为"ASC",顺序。且对象类型下目前只能用于数字排序，汉字英文之类的排序请在function自由发挥。orderBy计算顺序在select之后，数据已经变成新构造的数据，那么操作数据的时候就要用新的键名</p>
           <pre class="show-code">
             <code class="language-javascript">
                 // 广深总人口流动大于1000万的日期分析
@@ -851,7 +851,7 @@
           <h1><span class="father-title"></span>.orderBy</h1>
           <div class="line"></div>
           <p class="explain">jc.orderBy(data, iteratee), 进行排序操作，, 也可以写作jc.order。iteratee的类型： object || function</p>
-          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据。 第二个参数可以是obj || function,function类型下回调参数是left，right, 使用方式和原生js的sort一直;object类型使用{key1:"ASC",key2:"DESC"}的形式配置，ASC为升序，DESC为倒序</p>
+          <p class="tip success-tip">第一个参数是[obj,obj,obj]形式的数据。 第二个参数可以是obj || function,function类型下回调参数是left，right, 使用方式和原生js的sort一直;object类型使用{key1:"ASC",key2:"DESC"}的形式配置，desc代表降序（从大到小），asc代表升序（从小到大）,大小写都可以，不支持混合大小写使用</p>
           <pre class="show-code">
             <code class="language-javascript">
               var table = [
@@ -1028,6 +1028,16 @@
     }
     $(this).siblings(".category-list").toggle()
   })
+  function hSize() {
+    var winH = $(window).height();
+    var conH = winH - 40
+    $(".container").height(conH);
+    $(".left").height(conH);
+  }
+  hSize();
+  $(window).resize(function () {
+    hSize();
+  });
 </script>
 </body>
 </html>
