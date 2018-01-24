@@ -25,7 +25,7 @@
       <ul class = "node-list">
         <li class="node">
           <h1>多个条件排序</h1>
-          <p class="explain">JCalculator支持根据多个条件进行排序。orderBy是在对象类型的时候会按顺排序。想要更加自由的排序方式可以用function类型,回调参数是left，right，与原生sort函数用法类似</p>
+          <p class="explain">JCalculator支持根据多个条件进行排序。orderBy是在对象类型，desc代表降序（从大到小），asc代表升序（从小到大）,大小写都可以，不支持混合大小写使用。想要更加自由的排序方式可以用function类型,回调参数是left，right，与原生sort函数用法类似</p>
           <pre class="show-code">
             <code class="language-javascript">
               // 根据name和shopID分组计算sell的总和
@@ -50,6 +50,7 @@
                 from: data,
                 orderBy: {type: "DESC", all: "ASC" }
               });
+              console.log(order);
               /* output: [
                 {"all": 13, "type": 4},
                 {"all": 27, "type": 3},
